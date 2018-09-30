@@ -21,9 +21,9 @@ public class MainActivity extends Activity {
     private void initView() {
         mTivImage = findViewById(R.id.tiv_image);
 
-        mTivImage.setIncline(65f)
-                .setRadius(8f)
-                .setShadeColor(0xff373737, 0xffffffff, 0xff373737)
+        mTivImage.setIncline(65f)//梯形上底与下底长度差，单位是dp
+                .setRadius(8f)//圆角大小，单位是dp
+                .setShadeColor(0xff373737, 0xffffffff, 0xff373737)//遮罩渐变颜色组
         ;
     }
 
