@@ -22,7 +22,9 @@ public class MainActivity extends Activity {
         mTivImage = findViewById(R.id.tiv_image);
 
         mTivImage.setIncline(65f)
-                .setRadius(5f);
+                .setRadius(8f)
+                .setShadeColor(0xff373737, 0xffffffff, 0xff373737)
+        ;
     }
 
     private void initData() {

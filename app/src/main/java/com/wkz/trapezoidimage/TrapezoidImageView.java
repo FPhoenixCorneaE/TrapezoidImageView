@@ -14,29 +14,29 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-
 /**
  * 梯形图片控件
  */
-
 public class TrapezoidImageView extends ImageView {
 
     private static final float DEFAULT_INCLINE = 65F;
-    private static final float DEFAULT_RADIUS = 5F;
-    private static final int DEFAULT_SHADE_COLOR = 0X90000000;
+    private static final float DEFAULT_RADIUS = 8F;
+    private static final int[] DEFAULT_SHADE_COLOR = new int[]{0xff373737, 0xffffffff, 0xff373737};
 
     private Paint mPaint;//画梯形的画笔
     private Drawable mDrawable = null;//通过src设置的图片
     private int mWidth, mHeight;//控件的宽度和高度
     private float mIncline;//梯度,即上底与下底长度差
     private float mRadius;//圆角半径
-    private int mShadeColor;//遮罩颜色
-    private PorterDuffXfermode mXfermode;
+    private int[] mShadeColor;//遮罩颜色
+    private PorterDuffXfermode mXfermodeSrc;
+    private PorterDuffXfermode mXfermodeShape;
     private float[] mRadii;
 
     public TrapezoidImageView(Context context) {
@@ -61,11 +61,11 @@ public class TrapezoidImageView extends ImageView {
         this.mRadius = dpToPx(DEFAULT_RADIUS);
         this.mShadeColor = DEFAULT_SHADE_COLOR;
 
-        //初始化画笔
+        // 初始化画笔
         initPaint();
-        //圆角矩形
+        // 圆角矩形
         initRadii();
-        //图形绘制混合模式
+        // 图形绘制混合模式
         initXfermode();
 
         setDrawingCacheEnabled(true);
@@ -80,14 +80,16 @@ public class TrapezoidImageView extends ImageView {
     }
 
     private void initRadii() {
-        /*向路径中添加圆角矩形。radii数组定义圆角矩形的四个圆角的x,y半径。*/
-        /*圆角的半径，依次为左上角xy半径，右上角，右下角，左下角*/
+        /* 向路径中添加圆角矩形。radii数组定义圆角矩形的四个圆角的x,y半径。*/
+        /* 圆角的半径，依次为左上角xy半径，右上角，右下角，左下角。*/
         mRadii = new float[]{mRadius, mRadius, 0.0f, 0.0f, 0.0f, 0.0f, mRadius, mRadius};
     }
 
     private void initXfermode() {
-        //叠加处绘制源图,SRC_IN只显示两层图像交集部分的上层图像
-        mXfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
+        // 叠加处绘制源图,PorterDuff.Mode.SRC_IN只显示两层图像交集部分的上层图像
+        mXfermodeSrc = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
+        // 绘制遮罩,使用PorterDuff.Mode.MULTIPLY
+        mXfermodeShape = new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY);
     }
 
     @Override
@@ -141,17 +143,18 @@ public class TrapezoidImageView extends ImageView {
         // 保存为单独的层
         int saveCount = canvas.saveLayer(0, 0, mWidth, mHeight, mPaint, Canvas.ALL_SAVE_FLAG);
 
-        //绘制圆角矩形
+        // 绘制圆角矩形
         canvas.drawPath(getRoundRectPath(), mPaint);
 
-        //图形绘制混合模式
-        mPaint.setXfermode(mXfermode);
+        // 图形绘制混合模式
+        mPaint.setXfermode(mXfermodeSrc);
 
-        //绘制梯形路径
+        // 绘制梯形路径
         canvas.drawPath(getTrapezoidPath(), mPaint);
 
-        //画遮罩
-//        canvas.drawColor(mShadeColor, PorterDuff.Mode.SRC_ATOP);
+        // 画遮罩
+        mPaint.setXfermode(mXfermodeShape);
+        canvas.drawBitmap(getShapeBitmap(), new Matrix(), mPaint);
 
         mPaint.setXfermode(null);
         canvas.restoreToCount(saveCount);
@@ -163,7 +166,7 @@ public class TrapezoidImageView extends ImageView {
     @NonNull
     private Path getRoundRectPath() {
         Path path = new Path();
-        //向路径中添加圆角矩形
+        // 向路径中添加圆角矩形
         path.addRoundRect(new RectF(0, 0, mWidth, mHeight), mRadii, Path.Direction.CW);
         return path;
     }
@@ -207,6 +210,24 @@ public class TrapezoidImageView extends ImageView {
     }
 
     /**
+     * 获取遮罩Bitmap
+     *
+     * @return
+     */
+    private Bitmap getShapeBitmap() {
+        if (mShadeColor.length < 2) {
+            mShadeColor = DEFAULT_SHADE_COLOR;
+        }
+        GradientDrawable shapeDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, mShadeColor);
+        shapeDrawable.setShape(GradientDrawable.RECTANGLE);
+        Bitmap shapeBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+        Canvas shapeCanvas = new Canvas(shapeBitmap);
+        shapeDrawable.setBounds(0, 0, mWidth, mHeight);
+        shapeDrawable.draw(shapeCanvas);
+        return shapeBitmap;
+    }
+
+    /**
      * Convert dp to px
      */
     private float dpToPx(float dp) {
@@ -233,7 +254,7 @@ public class TrapezoidImageView extends ImageView {
         return this;
     }
 
-    public TrapezoidImageView setShadeColor(int mShadeColor) {
+    public TrapezoidImageView setShadeColor(int... mShadeColor) {
         this.mShadeColor = mShadeColor;
         return this;
     }
