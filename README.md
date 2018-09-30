@@ -2,7 +2,7 @@
 梯形图片控件
 ================================
 
-！[图片预览](https://github.com/FPhoenixCorneaE/TrapezoidImageView/blob/master/preview/preview.gif)
+![图片预览](https://github.com/FPhoenixCorneaE/TrapezoidImageView/blob/master/preview/preview.gif)
 
 -----------------------------
 
