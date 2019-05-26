@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TrapezoidImageView">
+        <attr name="tiv_in_cline" format="dimension" />
+        <attr name="tiv_radius" format="dimension" />
+        <attr name="tiv_shade_colors" format="reference" />
+    </declare-styleable>
+</resources>

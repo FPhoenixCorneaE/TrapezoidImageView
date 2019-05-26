@@ -1,12 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="15dp">
+    android:layout_height="wrap_content">
 
-    <com.wkz.trapezoidimage.TrapezoidImageView
-        android:id="@+id/tiv_image"
-        android:layout_width="215dp"
-        android:layout_height="185dp"
-        android:scaleType="centerCrop" />
-</RelativeLayout>
+    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="15dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <com.wkz.trapezoidimage.TrapezoidImageView
+                android:id="@+id/tiv_image_1"
+                android:layout_width="match_parent"
+                android:layout_height="185dp"
+                android:layout_marginTop="20dp"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/img_1"
+                app:tiv_radius="10dp" />
+
+            <com.wkz.trapezoidimage.TrapezoidImageView
+                android:id="@+id/tiv_image_3"
+                android:layout_width="match_parent"
+                android:layout_height="185dp"
+                android:layout_marginTop="20dp"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/img_2"
+                app:tiv_in_cline="80dp"
+                app:tiv_radius="15dp"
+                app:tiv_shade_colors="@array/ShadeColors_1" />
+
+            <com.wkz.trapezoidimage.TrapezoidImageView
+                android:id="@+id/tiv_image_5"
+                android:layout_width="match_parent"
+                android:layout_height="185dp"
+                android:layout_marginTop="20dp"
+                android:scaleType="centerCrop"
+                android:src="@android:color/white"
+                app:tiv_in_cline="100dp"
+                app:tiv_radius="20dp"
+                app:tiv_shade_colors="@array/ShadeColors" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <com.wkz.trapezoidimage.TrapezoidImageView1
+                android:id="@+id/tiv_image_2"
+                android:layout_width="match_parent"
+                android:layout_height="185dp"
+                android:layout_marginTop="20dp"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/img_1"
+                app:tiv_radius="10dp" />
+
+            <com.wkz.trapezoidimage.TrapezoidImageView1
+                android:id="@+id/tiv_image_4"
+                android:layout_width="match_parent"
+                android:layout_height="185dp"
+                android:layout_marginTop="20dp"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/img_2"
+                app:tiv_in_cline="80dp"
+                app:tiv_radius="15dp"
+                app:tiv_shade_colors="@array/ShadeColors_1" />
+
+            <com.wkz.trapezoidimage.TrapezoidImageView1
+                android:id="@+id/tiv_image_6"
+                android:layout_width="match_parent"
+                android:layout_height="185dp"
+                android:layout_marginTop="20dp"
+                android:scaleType="centerCrop"
+                android:src="@android:color/white"
+                app:tiv_in_cline="100dp"
+                app:tiv_radius="20dp"
+                app:tiv_shade_colors="@array/ShadeColors" />
+        </LinearLayout>
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

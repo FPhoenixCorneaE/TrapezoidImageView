@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="shade_color_start">#ff373737</color>
+    <color name="shade_color_center">#ffffffff</color>
+    <color name="shade_color_end">#ff373737</color>
+
+    <color name="shade_color_start_1">#33ff0000</color>
+    <color name="shade_color_center_1">#ffffffff</color>
+    <color name="shade_color_end_1">#3300ff00</color>
+</resources>

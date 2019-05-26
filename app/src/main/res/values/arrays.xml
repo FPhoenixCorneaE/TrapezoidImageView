@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="ShadeColors">
+        <item>@color/shade_color_start</item>
+        <item>@color/shade_color_center</item>
+        <item>@color/shade_color_end</item>
+    </integer-array>
+
+    <integer-array name="ShadeColors_1">
+        <item>@color/shade_color_start_1</item>
+        <item>@color/shade_color_center_1</item>
+        <item>@color/shade_color_end_1</item>
+    </integer-array>
+</resources>
