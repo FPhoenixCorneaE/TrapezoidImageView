@@ -1,47 +1,48 @@
 # TrapezoidImageView
+
 梯形图片控件
 ================================
 
-![图片预览](https://github.com/FPhoenixCorneaE/TrapezoidImageView/blob/master/preview/preview.gif)
+![图片预览](https://github.com/FPhoenixCorneaE/TrapezoidImageView/blob/master/images/trapezoid-view.gif)
 
------------------------------
 
 xml中使用
 ----------
+
 ```
-<com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView
-                android:id="@+id/tiv_image_3"
-                android:layout_width="match_parent"
-                android:layout_height="185dp"
-                android:layout_marginTop="20dp"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/img_2"
-                app:tiv_in_cline="80dp"
-                app:trapezoidRadius="15dp"
-                app:trapezoidShadeColors="@array/ShadeColors_1" />
+        <com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView
+            android:id="@+id/iv_image_3"
+            android:layout_width="match_parent"
+            android:layout_height="185dp"
+            android:layout_marginTop="8dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/img_3"
+            app:trapezoidIncline="100dp"
+            app:trapezoidRadius="20dp"
+            app:trapezoidShadeColors="@array/ShadeColors_3" />
 ```
 
---------------------
 
 设置属性
 --------------
+
 ```
-mTivImage1
-                //梯形上底与下底长度差，单位是dp
-                .setIncline(65f)
-                //圆角大小，单位是dp
-                .setRadius(8f)
-                //遮罩渐变颜色组
-                .setShadeColor(0xff373737, 0xffffffff, 0xff373737)
-        ;
+        mIvImage1?.apply {
+            // 梯形上底与下底长度差
+            incline = 120f
+            // 圆角大小
+            radius = 20f
+            // 遮罩渐变颜色组
+            shadeColor = resources.getIntArray(R.array.ShadeColors_1)
+        }
 ```
 
-----------------
 
 加载图片，以Glide示例加载
 ----------------
+
 ```
-Glide.with(mTivImage1)
-                .load(IMAGE_URL)
-                .into(mTivImage1);
+        Glide.with(mIvImage1!!)
+            .load(IMAGE_URL)
+            .into(mIvImage1!!)
 ```

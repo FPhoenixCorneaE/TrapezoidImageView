@@ -1,26 +1,14 @@
-package com.fphoenixcorneae.widget.trapezoidview;
+package com.fphoenixcorneae.widget.trapezoidview
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.RectF;
-import android.graphics.Shader;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.util.AttributeSet;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatImageView;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatImageView
+import kotlin.math.max
 
 /**
  * 梯形图片控件
@@ -28,226 +16,198 @@ import androidx.appcompat.widget.AppCompatImageView;
  * @author wkz
  * @date 2019/5/26 12:49
  */
-public class TrapezoidImageView extends AppCompatImageView {
+class TrapezoidImageView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : AppCompatImageView(context, attrs, defStyleAttr) {
+    /** 画梯形的画笔 */
+    private var mPaint: Paint = Paint()
 
-    private static final float DEFAULT_INCLINE = 60F;
-    private static final float DEFAULT_RADIUS = 8F;
-    private static final int[] DEFAULT_SHADE_COLOR = new int[]{0xff373737, 0xffffffff, 0xff373737};
+    /** 通过src设置的图片 */
+    private var mDrawable: Drawable? = null
 
-    /**
-     * 画梯形的画笔
-     */
-    private Paint mPaint;
-    /**
-     * 通过src设置的图片
-     */
-    private Drawable mDrawable = null;
-    /**
-     * 控件的宽度和高度
-     */
-    private int mWidth, mHeight;
-    /**
-     * 梯度差,即上底与下底长度差
-     */
-    private float mIncline;
-    /**
-     * 圆角半径
-     */
-    private float mRadius;
-    /**
-     * 遮罩颜色
-     */
-    private int[] mShadeColor = DEFAULT_SHADE_COLOR;
-    private PorterDuffXfermode mXfermodeShade;
-    private float[] mRadii;
+    /** 控件的宽度和高度 */
+    private var mWidth = 0
+    private var mHeight = 0
 
-    public TrapezoidImageView(Context context) {
-        this(context, null);
-    }
+    /** 绘制遮罩,使用PorterDuff.Mode.MULTIPLY */
+    private var mXfermodeShade = PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
 
-    public TrapezoidImageView(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
+    /** 圆角半径数组 */
+    private lateinit var mRadii: FloatArray
 
-    public TrapezoidImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        if (attrs != null) {
-            initAttributes(context, attrs, defStyleAttr);
-        } else {
-            this.mIncline = dpToPx(DEFAULT_INCLINE);
-            this.mRadius = dpToPx(DEFAULT_RADIUS);
-            this.mShadeColor = DEFAULT_SHADE_COLOR;
+    /** 梯度差,即上底与下底长度差 */
+    var incline = dpToPx(DEFAULT_INCLINE)
+
+    /** 圆角半径 */
+    var radius = dpToPx(DEFAULT_RADIUS)
+        set(value) {
+            field = value
+            initRadii()
         }
-        init();
-    }
+
+    /** 遮罩颜色渐变数组 */
+    var shadeColor = DEFAULT_SHADE_COLOR
 
     /**
      * 初始化自定义属性
      */
-    private void initAttributes(Context context, AttributeSet attrs, int defStyleAttr) {
-        TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TrapezoidImageView, defStyleAttr, 0);
+    private fun initAttributes(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
+        val attributes = context.theme.obtainStyledAttributes(attrs, R.styleable.TrapezoidImageView, defStyleAttr, 0)
         try {
-            mIncline = attributes.getDimension(R.styleable.TrapezoidImageView_trapezoidIncline, dpToPx(DEFAULT_INCLINE));
-            mRadius = attributes.getDimension(R.styleable.TrapezoidImageView_trapezoidRadius, dpToPx(DEFAULT_RADIUS));
-            int shadeColorRes = attributes.getResourceId(R.styleable.TrapezoidImageView_trapezoidShadeColors, 0);
+            incline = attributes.getDimension(R.styleable.TrapezoidImageView_trapezoidIncline, dpToPx(DEFAULT_INCLINE))
+            radius = attributes.getDimension(R.styleable.TrapezoidImageView_trapezoidRadius, dpToPx(DEFAULT_RADIUS))
+            val shadeColorRes = attributes.getResourceId(R.styleable.TrapezoidImageView_trapezoidShadeColors, 0)
             if (shadeColorRes != 0) {
-                mShadeColor = getResources().getIntArray(shadeColorRes);
+                shadeColor = resources.getIntArray(shadeColorRes)
             }
         } finally {
-            attributes.recycle();
+            attributes.recycle()
         }
     }
 
-    /**
-     * 初始化操作
-     */
-    private void init() {
-
-        // 初始化画笔
-        initPaint();
-        // 圆角矩形
-        initRadii();
-        // 图形绘制混合模式
-        initXfermode();
-
-        setWillNotDraw(false);
+    private fun initPaint() {
+        mPaint.style = Paint.Style.FILL
+        mPaint.isAntiAlias = true
+        mPaint.flags = Paint.ANTI_ALIAS_FLAG
     }
 
-    private void initPaint() {
-        mPaint = new Paint();
-        mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setAntiAlias(true);
-        mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-    }
-
-    private void initRadii() {
+    private fun initRadii() {
         /* 向路径中添加圆角矩形。radii数组定义圆角矩形的四个圆角的x,y半径。*/
         /* 圆角的半径，依次为左上角xy半径，右上角，右下角，左下角。*/
-        mRadii = new float[]{mRadius, mRadius, 0.0f, 0.0f, 0.0f, 0.0f, mRadius, mRadius};
+        mRadii = floatArrayOf(radius, radius, 0f, 0f, 0f, 0f, radius, radius)
     }
 
-    private void initXfermode() {
+    private fun initXfermode() {
         // 绘制遮罩,使用PorterDuff.Mode.MULTIPLY
-        mXfermodeShade = new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY);
+        mXfermodeShade = PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        mWidth = getMeasuredWidth();
-        mHeight = getMeasuredHeight();
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        mWidth = measuredWidth
+        mHeight = measuredHeight
     }
 
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        mWidth = w;
-        mHeight = h;
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        mWidth = w
+        mHeight = h
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        mDrawable = getDrawable();
-
+    override fun onDraw(canvas: Canvas) {
+        mDrawable = drawable
         if (mDrawable == null || mWidth == 0 || mHeight == 0) {
-            return;
+            return
         }
 
         // 初始化BitmapShader
-        initBitmapShader();
+        initBitmapShader()
 
         // 画梯形图片
-        canvasTrapezoid(canvas);
+        canvasTrapezoid(canvas)
     }
 
     /**
      * 初始化BitmapShader
      */
-    private void initBitmapShader() {
-        Bitmap srcBitmap = getSrcBitmap();
-        BitmapShader mShader = new BitmapShader(srcBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-        float scale = Math.max(getWidth() * 1.0f / srcBitmap.getWidth(), getHeight() * 1.0f / srcBitmap.getHeight());
-        Matrix mMatrix = new Matrix();
-        mMatrix.setScale(scale, scale);
-        mShader.setLocalMatrix(mMatrix);
-        mPaint.setShader(mShader);
+    private fun initBitmapShader() {
+        val srcBitmap = getSrcBitmap()
+        val mShader = BitmapShader(srcBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+        val scale = max(width * 1.0f / srcBitmap.width, height * 1.0f / srcBitmap.height)
+        val mMatrix = Matrix()
+        mMatrix.setScale(scale, scale)
+        mShader.setLocalMatrix(mMatrix)
+        mPaint.shader = mShader
     }
 
     /**
      * 画梯形图片
      */
     @SuppressLint("WrongCall")
-    private void canvasTrapezoid(Canvas canvas) {
+    private fun canvasTrapezoid(canvas: Canvas) {
         // 背景透明
-        canvas.drawColor(Color.TRANSPARENT);
-        // 获取圆角矩形路径
-        Path roundRectPath = getRoundRectPath();
-        // 获取梯形路径
-        Path trapezoidPath = getTrapezoidPath();
-        // 获取圆角矩形路径与梯形路径相交区域，结果存入圆角矩形路径中
-        roundRectPath.op(trapezoidPath, Path.Op.INTERSECT);
-        canvas.drawPath(roundRectPath, mPaint);
+        canvas.drawColor(Color.TRANSPARENT)
+        // 获取圆角梯形路径
+        val roundTrapezoidPath = getRoundTrapezoidPath()
         // 裁剪圆角梯形路径
-        canvas.clipPath(roundRectPath);
-        super.onDraw(canvas);
+        canvas.clipPath(roundTrapezoidPath)
+        super.onDraw(canvas)
 
         // 画遮罩
-        Bitmap shadeBitmap = getShadeBitmap();
+        val shadeBitmap = getShadeBitmap()
         // 遮罩图形绘制混合模式
-        mPaint.setXfermode(mXfermodeShade);
-        canvas.drawBitmap(shadeBitmap, new Matrix(), mPaint);
-        mPaint.setXfermode(null);
+        mPaint.xfermode = mXfermodeShade
+        canvas.drawBitmap(shadeBitmap, Matrix(), mPaint)
+        mPaint.xfermode = null
         // 回收遮罩位图
-        shadeBitmap.recycle();
+        shadeBitmap.recycle()
     }
 
     /**
-     * 获取圆角矩形路径
+     * 利用布尔操作运算获取圆角梯形路径
      */
-    private Path getRoundRectPath() {
-        Path path = new Path();
+    private fun getRoundTrapezoidPath(): Path {
+        // 获取圆角矩形路径
+        val roundRectPath = Path()
         // 向路径中添加圆角矩形
-        path.addRoundRect(new RectF(0, 0, mWidth, mHeight), mRadii, Path.Direction.CW);
-        path.close();
-        return path;
+        roundRectPath.addRoundRect(0f, 0f, mWidth.toFloat(), mHeight.toFloat(), mRadii, Path.Direction.CW)
+        roundRectPath.close()
+        // 获取梯形路径
+        val trapezoidPath = Path()
+        trapezoidPath.moveTo(0f, 0f)
+        trapezoidPath.lineTo(mWidth.toFloat(), 0f)
+        trapezoidPath.lineTo(mWidth - incline, mHeight.toFloat())
+        trapezoidPath.lineTo(0f, mHeight.toFloat())
+        trapezoidPath.close()
+        // 布尔操作运算获取圆角矩形路径与梯形路径相交区域，结果存入圆角矩形路径中
+        roundRectPath.op(trapezoidPath, Path.Op.INTERSECT)
+        return roundRectPath
     }
 
     /**
-     * 获取梯形路径
+     * 利用贝塞尔曲线获取圆角梯形路径
      */
-    private Path getTrapezoidPath() {
-        Path trapezoidPath = new Path();
-        trapezoidPath.moveTo(0, 0);
-        trapezoidPath.lineTo(mWidth, 0);
-        trapezoidPath.lineTo(mWidth - mIncline, mHeight);
-        trapezoidPath.lineTo(0, mHeight);
-        trapezoidPath.close();
-        return trapezoidPath;
+    private fun getRoundTrapezoidPath2(): Path {
+        val trapezoidPath = Path()
+        // 移动至左上角
+        trapezoidPath.moveTo(radius, 0f)
+        // 画直线到右上角
+        trapezoidPath.lineTo(mWidth.toFloat(), 0f)
+        // 画直线到右下角
+        trapezoidPath.lineTo(mWidth - incline, mHeight.toFloat())
+        // 贝塞尔曲线绘制左下角的圆角
+        trapezoidPath.lineTo(radius, mHeight.toFloat())
+        trapezoidPath.quadTo(0f, mHeight.toFloat(), 0f, mHeight - radius)
+        // 贝塞尔曲线绘制左上角的圆角
+        trapezoidPath.lineTo(0f, radius)
+        trapezoidPath.quadTo(0f, 0f, radius, 0f)
+        // 闭合路径
+        trapezoidPath.close()
+        return trapezoidPath
     }
 
     /**
      * 将mDrawable转换成Bitmap对象
      */
-    private Bitmap getSrcBitmap() {
-        if (mDrawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable) mDrawable).getBitmap();
+    private fun getSrcBitmap(): Bitmap {
+        if (mDrawable is BitmapDrawable) {
+            return (mDrawable as BitmapDrawable).bitmap
         }
-        int bitmapWidth = mDrawable.getIntrinsicWidth();
-        int bitmapHeight = mDrawable.getIntrinsicHeight();
-
+        var bitmapWidth = mDrawable!!.intrinsicWidth
+        var bitmapHeight = mDrawable!!.intrinsicHeight
         if (bitmapWidth <= 0) {
-            bitmapWidth = mWidth;
+            bitmapWidth = mWidth
         }
-
         if (bitmapHeight <= 0) {
-            bitmapHeight = mHeight;
+            bitmapHeight = mHeight
         }
-
-        Bitmap mBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvasBitmap = new Canvas(mBitmap);
-        mDrawable.setBounds(0, 0, bitmapWidth, bitmapHeight);
-        mDrawable.draw(canvasBitmap);
-        return mBitmap;
+        val mBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888)
+        val canvasBitmap = Canvas(mBitmap)
+        mDrawable!!.setBounds(0, 0, bitmapWidth, bitmapHeight)
+        mDrawable!!.draw(canvasBitmap)
+        return mBitmap
     }
 
     /**
@@ -255,51 +215,41 @@ public class TrapezoidImageView extends AppCompatImageView {
      *
      * @return 遮罩Bitmap
      */
-    private Bitmap getShadeBitmap() {
-        if (mShadeColor.length < 2) {
-            mShadeColor = DEFAULT_SHADE_COLOR;
+    private fun getShadeBitmap(): Bitmap {
+        if (shadeColor.size < 2) {
+            shadeColor = DEFAULT_SHADE_COLOR
         }
-        GradientDrawable shapeDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, mShadeColor);
-        shapeDrawable.setShape(GradientDrawable.RECTANGLE);
-        Bitmap shapeBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-        Canvas shapeCanvas = new Canvas(shapeBitmap);
-        shapeDrawable.setBounds(0, 0, mWidth, mHeight);
-        shapeDrawable.draw(shapeCanvas);
-        return shapeBitmap;
+        val shapeDrawable = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, shadeColor)
+        shapeDrawable.shape = GradientDrawable.RECTANGLE
+        val shapeBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888)
+        val shapeCanvas = Canvas(shapeBitmap)
+        shapeDrawable.setBounds(0, 0, mWidth, mHeight)
+        shapeDrawable.draw(shapeCanvas)
+        return shapeBitmap
     }
 
     /**
      * Convert dp to px
      */
-    private float dpToPx(float dp) {
-        float scale = this.getContext().getResources().getDisplayMetrics().density;
-        return dp * scale;
+    private fun dpToPx(dp: Float): Float {
+        val scale = this.context.resources.displayMetrics.density
+        return dp * scale
     }
 
-    /**
-     * @param mIncline dpValue
-     */
-    public TrapezoidImageView setIncline(float mIncline) {
-        this.mIncline = dpToPx(mIncline);
-        return this;
+    companion object {
+        private const val DEFAULT_INCLINE = 60f
+        private const val DEFAULT_RADIUS = 8f
+        private val DEFAULT_SHADE_COLOR = intArrayOf(-0xc8c8c9, -0x1, -0xc8c8c9)
     }
 
-    /**
-     * @param mRadius dpValue
-     */
-    public TrapezoidImageView setRadius(float mRadius) {
-        this.mRadius = dpToPx(mRadius);
-        initRadii();
-        return this;
-    }
-
-    public TrapezoidImageView setShadeColor(int... mShadeColor) {
-        this.mShadeColor = mShadeColor;
-        return this;
-    }
-
-    public TrapezoidImageView setRadii(float[] mRadii) {
-        this.mRadii = mRadii;
-        return this;
+    init {
+        initAttributes(context, attrs, defStyleAttr)
+        // 初始化画笔
+        initPaint()
+        // 圆角矩形
+        initRadii()
+        // 图形绘制混合模式
+        initXfermode()
+        setWillNotDraw(false)
     }
 }

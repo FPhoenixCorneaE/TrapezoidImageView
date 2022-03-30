@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="shade_color_start">#ff373737</color>
-    <color name="shade_color_center">#ffffffff</color>
-    <color name="shade_color_end">#ff373737</color>
-
-    <color name="shade_color_start_1">#ffff0000</color>
+    <color name="shade_color_start_1">#ff373737</color>
     <color name="shade_color_center_1">#ffffffff</color>
-    <color name="shade_color_end_1">#ff00ff00</color>
+    <color name="shade_color_end_1">#ff373737</color>
 
-    <color name="shade_color_start_2">#ffffff00</color>
+    <color name="shade_color_start_2">#ffff0000</color>
     <color name="shade_color_center_2">#ffffffff</color>
-    <color name="shade_color_end_2">#ffff00ff</color>
+    <color name="shade_color_end_2">#ff00ff00</color>
+
+    <color name="shade_color_start_3">#ffffff00</color>
+    <color name="shade_color_center_3">#ffffffff</color>
+    <color name="shade_color_end_3">#ffff00ff</color>
 </resources>

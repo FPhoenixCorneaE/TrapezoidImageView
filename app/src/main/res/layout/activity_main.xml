@@ -1,89 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:orientation="vertical"
+        android:padding="32dp">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+        <com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView
+            android:id="@+id/iv_image_1"
+            android:layout_width="match_parent"
+            android:layout_height="185dp"
+            android:layout_marginTop="8dp"
+            android:scaleType="centerCrop"
+            tools:src="@mipmap/img_1" />
 
-            <com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView
-                android:id="@+id/tiv_image_1"
-                android:layout_width="match_parent"
-                android:layout_height="185dp"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/img_1"
-                app:trapezoidRadius="10dp"
-                app:trapezoidShadeColors="@array/ShadeColors_2" />
+        <com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView
+            android:id="@+id/iv_image_2"
+            android:layout_width="match_parent"
+            android:layout_height="185dp"
+            android:layout_marginTop="8dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/img_2"
+            app:trapezoidIncline="80dp"
+            app:trapezoidRadius="15dp"
+            app:trapezoidShadeColors="@array/ShadeColors_2" />
 
-            <com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView
-                android:id="@+id/tiv_image_3"
-                android:layout_width="match_parent"
-                android:layout_height="185dp"
-                android:layout_marginTop="8dp"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/img_2"
-                app:trapezoidIncline="80dp"
-                app:trapezoidRadius="15dp"
-                app:trapezoidShadeColors="@array/ShadeColors_1" />
-
-            <com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView
-                android:id="@+id/tiv_image_5"
-                android:layout_width="match_parent"
-                android:layout_height="185dp"
-                android:layout_marginTop="8dp"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/img_3"
-                app:trapezoidIncline="100dp"
-                app:trapezoidRadius="20dp"
-                app:trapezoidShadeColors="@array/ShadeColors_2" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView1
-                android:id="@+id/tiv_image_2"
-                android:layout_width="match_parent"
-                android:layout_height="185dp"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/img_1"
-                app:trapezoidRadius="10dp"
-                app:trapezoidShadeColors="@array/ShadeColors_2" />
-
-            <com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView1
-                android:id="@+id/tiv_image_4"
-                android:layout_width="match_parent"
-                android:layout_height="185dp"
-                android:layout_marginTop="8dp"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/img_2"
-                app:trapezoidIncline="80dp"
-                app:trapezoidRadius="15dp"
-                app:trapezoidShadeColors="@array/ShadeColors_1" />
-
-            <com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView1
-                android:id="@+id/tiv_image_6"
-                android:layout_width="match_parent"
-                android:layout_height="185dp"
-                android:layout_marginTop="8dp"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/img_3"
-                app:trapezoidIncline="100dp"
-                app:trapezoidRadius="20dp"
-                app:trapezoidShadeColors="@array/ShadeColors_2" />
-        </LinearLayout>
+        <com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView
+            android:id="@+id/iv_image_3"
+            android:layout_width="match_parent"
+            android:layout_height="185dp"
+            android:layout_marginTop="8dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/img_3"
+            app:trapezoidIncline="100dp"
+            app:trapezoidRadius="20dp"
+            app:trapezoidShadeColors="@array/ShadeColors_3" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
