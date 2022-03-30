@@ -11,4 +11,10 @@
         <item>@color/shade_color_center_1</item>
         <item>@color/shade_color_end_1</item>
     </integer-array>
+
+    <integer-array name="ShadeColors_2">
+        <item>@color/shade_color_start_2</item>
+        <item>@color/shade_color_center_2</item>
+        <item>@color/shade_color_end_2</item>
+    </integer-array>
 </resources>

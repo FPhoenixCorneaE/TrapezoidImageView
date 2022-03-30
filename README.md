@@ -9,7 +9,7 @@
 xml中使用
 ----------
 ```
-<com.wkz.trapezoidimage.TrapezoidImageView
+<com.fphoenixcorneae.widget.trapezoidview.TrapezoidImageView
                 android:id="@+id/tiv_image_3"
                 android:layout_width="match_parent"
                 android:layout_height="185dp"
@@ -17,8 +17,8 @@ xml中使用
                 android:scaleType="centerCrop"
                 android:src="@mipmap/img_2"
                 app:tiv_in_cline="80dp"
-                app:tiv_radius="15dp"
-                app:tiv_shade_colors="@array/ShadeColors_1" />
+                app:trapezoidRadius="15dp"
+                app:trapezoidShadeColors="@array/ShadeColors_1" />
 ```
 
 --------------------

@@ -4,7 +4,11 @@
     <color name="shade_color_center">#ffffffff</color>
     <color name="shade_color_end">#ff373737</color>
 
-    <color name="shade_color_start_1">#33ff0000</color>
+    <color name="shade_color_start_1">#ffff0000</color>
     <color name="shade_color_center_1">#ffffffff</color>
-    <color name="shade_color_end_1">#3300ff00</color>
+    <color name="shade_color_end_1">#ff00ff00</color>
+
+    <color name="shade_color_start_2">#ffffff00</color>
+    <color name="shade_color_center_2">#ffffffff</color>
+    <color name="shade_color_end_2">#ffff00ff</color>
 </resources>

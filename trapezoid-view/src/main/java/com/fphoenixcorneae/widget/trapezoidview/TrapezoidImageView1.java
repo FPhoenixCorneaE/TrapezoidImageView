@@ -1,5 +1,6 @@
-package com.wkz.trapezoidimage;
+package com.fphoenixcorneae.widget.trapezoidview;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -11,15 +12,14 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageView;
 
 /**
  * 梯形图片控件
@@ -27,7 +27,7 @@ import android.widget.ImageView;
  * @author wkz
  * @date 2019/5/26 12:49
  */
-public class TrapezoidImageView extends ImageView {
+public class TrapezoidImageView1 extends AppCompatImageView {
 
     private static final float DEFAULT_INCLINE = 60F;
     private static final float DEFAULT_RADIUS = 8F;
@@ -57,19 +57,18 @@ public class TrapezoidImageView extends ImageView {
      * 遮罩颜色
      */
     private int[] mShadeColor;
-    private PorterDuffXfermode mXfermodeSrc;
-    private PorterDuffXfermode mXfermodeShape;
+    private PorterDuffXfermode mXfermodeShade;
     private float[] mRadii;
 
-    public TrapezoidImageView(Context context) {
+    public TrapezoidImageView1(Context context) {
         this(context, null);
     }
 
-    public TrapezoidImageView(Context context, @Nullable AttributeSet attrs) {
+    public TrapezoidImageView1(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public TrapezoidImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public TrapezoidImageView1(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         if (attrs != null) {
             initAttributes(context, attrs, defStyleAttr);
@@ -87,9 +86,9 @@ public class TrapezoidImageView extends ImageView {
     private void initAttributes(Context context, AttributeSet attrs, int defStyleAttr) {
         TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TrapezoidImageView, defStyleAttr, 0);
         try {
-            mIncline = attributes.getDimension(R.styleable.TrapezoidImageView_tiv_in_cline, DEFAULT_INCLINE);
-            mRadius = attributes.getDimension(R.styleable.TrapezoidImageView_tiv_radius, DEFAULT_RADIUS);
-            int shadeColorRes = attributes.getResourceId(R.styleable.TrapezoidImageView_tiv_shade_colors, 0);
+            mIncline = attributes.getDimension(R.styleable.TrapezoidImageView_trapezoidIncline, dpToPx(DEFAULT_INCLINE));
+            mRadius = attributes.getDimension(R.styleable.TrapezoidImageView_trapezoidRadius, dpToPx(DEFAULT_RADIUS));
+            int shadeColorRes = attributes.getResourceId(R.styleable.TrapezoidImageView_trapezoidShadeColors, 0);
             if (shadeColorRes != 0) {
                 mShadeColor = getResources().getIntArray(shadeColorRes);
             } else {
@@ -112,7 +111,6 @@ public class TrapezoidImageView extends ImageView {
         // 图形绘制混合模式
         initXfermode();
 
-        setDrawingCacheEnabled(true);
         setWillNotDraw(false);
     }
 
@@ -130,10 +128,8 @@ public class TrapezoidImageView extends ImageView {
     }
 
     private void initXfermode() {
-        // 叠加处绘制源图,PorterDuff.Mode.SRC_IN只显示两层图像交集部分的上层图像
-        mXfermodeSrc = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
         // 绘制遮罩,使用PorterDuff.Mode.MULTIPLY
-        mXfermodeShape = new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY);
+        mXfermodeShade = new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY);
     }
 
     @Override
@@ -158,10 +154,10 @@ public class TrapezoidImageView extends ImageView {
             return;
         }
 
-        //初始化BitmapShader
+        // 初始化BitmapShader
         initBitmapShader();
 
-        //画梯形图片
+        // 画梯形图片
         canvasTrapezoid(canvas);
     }
 
@@ -169,8 +165,9 @@ public class TrapezoidImageView extends ImageView {
      * 初始化BitmapShader
      */
     private void initBitmapShader() {
-        BitmapShader mShader = new BitmapShader(getSrcBitmap(), Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-        float scale = Math.max(getWidth() * 1.0f / getSrcBitmap().getWidth(), getHeight() * 1.0f / getSrcBitmap().getHeight());
+        Bitmap srcBitmap = getSrcBitmap();
+        BitmapShader mShader = new BitmapShader(srcBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        float scale = Math.max(getWidth() * 1.0f / srcBitmap.getWidth(), getHeight() * 1.0f / srcBitmap.getHeight());
         Matrix mMatrix = new Matrix();
         mMatrix.setScale(scale, scale);
         mShader.setLocalMatrix(mMatrix);
@@ -180,50 +177,42 @@ public class TrapezoidImageView extends ImageView {
     /**
      * 画梯形图片
      */
+    @SuppressLint("WrongCall")
     private void canvasTrapezoid(Canvas canvas) {
         // 背景透明
         canvas.drawColor(Color.TRANSPARENT);
-        // 保存为单独的层
-        int saveCount = canvas.saveLayer(0, 0, mWidth, mHeight, mPaint, Canvas.ALL_SAVE_FLAG);
-
-        // 绘制圆角矩形
-        canvas.drawPath(getRoundRectPath(), mPaint);
-
-        // 图形绘制混合模式
-        mPaint.setXfermode(mXfermodeSrc);
-
-        // 绘制梯形路径
-        canvas.drawPath(getTrapezoidPath(), mPaint);
+        // 裁剪梯形路径
+        canvas.clipPath(getRoundTrapezoidPath());
+        super.onDraw(canvas);
 
         // 画遮罩
-        mPaint.setXfermode(mXfermodeShape);
-        canvas.drawBitmap(getShapeBitmap(), new Matrix(), mPaint);
-
+        Bitmap shadeBitmap = getShadeBitmap();
+        // 遮罩图形绘制混合模式
+        mPaint.setXfermode(mXfermodeShade);
+        canvas.drawBitmap(shadeBitmap, new Matrix(), mPaint);
         mPaint.setXfermode(null);
-        canvas.restoreToCount(saveCount);
+        // 回收遮罩位图
+        shadeBitmap.recycle();
     }
 
     /**
-     * 获取圆角矩形路径
+     * 获取圆角梯形路径
      */
-    @NonNull
-    private Path getRoundRectPath() {
-        Path path = new Path();
-        // 向路径中添加圆角矩形
-        path.addRoundRect(new RectF(0, 0, mWidth, mHeight), mRadii, Path.Direction.CW);
-        path.close();
-        return path;
-    }
-
-    /**
-     * 获取梯形路径
-     */
-    private Path getTrapezoidPath() {
+    private Path getRoundTrapezoidPath() {
         Path trapezoidPath = new Path();
-        trapezoidPath.moveTo(0, 0);
+        // 移动至左上角
+        trapezoidPath.moveTo(mRadius, 0);
+        // 画直线到右上角
         trapezoidPath.lineTo(mWidth, 0);
+        // 画直线到右下角
         trapezoidPath.lineTo(mWidth - mIncline, mHeight);
-        trapezoidPath.lineTo(0, mHeight);
+        // 贝塞尔曲线绘制左下角的圆角
+        trapezoidPath.lineTo(mRadius, mHeight);
+        trapezoidPath.quadTo(0, mHeight, 0, mHeight - mRadius);
+        // 贝塞尔曲线绘制左上角的圆角
+        trapezoidPath.lineTo(0, mRadius);
+        trapezoidPath.quadTo(0, 0, mRadius, 0);
+        // 闭合路径
         trapezoidPath.close();
         return trapezoidPath;
     }
@@ -258,7 +247,7 @@ public class TrapezoidImageView extends ImageView {
      *
      * @return 遮罩Bitmap
      */
-    private Bitmap getShapeBitmap() {
+    private Bitmap getShadeBitmap() {
         if (mShadeColor.length < 2) {
             mShadeColor = DEFAULT_SHADE_COLOR;
         }
@@ -282,7 +271,7 @@ public class TrapezoidImageView extends ImageView {
     /**
      * @param mIncline dpValue
      */
-    public TrapezoidImageView setIncline(float mIncline) {
+    public TrapezoidImageView1 setIncline(float mIncline) {
         this.mIncline = dpToPx(mIncline);
         return this;
     }
@@ -290,18 +279,18 @@ public class TrapezoidImageView extends ImageView {
     /**
      * @param mRadius dpValue
      */
-    public TrapezoidImageView setRadius(float mRadius) {
+    public TrapezoidImageView1 setRadius(float mRadius) {
         this.mRadius = dpToPx(mRadius);
         initRadii();
         return this;
     }
 
-    public TrapezoidImageView setShadeColor(int... mShadeColor) {
+    public TrapezoidImageView1 setShadeColor(int... mShadeColor) {
         this.mShadeColor = mShadeColor;
         return this;
     }
 
-    public TrapezoidImageView setRadii(float[] mRadii) {
+    public TrapezoidImageView1 setRadii(float[] mRadii) {
         this.mRadii = mRadii;
         return this;
     }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TrapezoidImageView">
+        <attr name="trapezoidIncline" format="dimension" />
+        <attr name="trapezoidRadius" format="dimension" />
+        <attr name="trapezoidShadeColors" format="reference" />
+    </declare-styleable>
+</resources>
