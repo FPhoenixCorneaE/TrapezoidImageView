@@ -1,0 +1,15 @@
+apply plugin: "org.gradle.maven-publish"
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication.
+            maven(MavenPublication) {
+                from(components["release"])
+                groupId = "com.github.FPhoenixCorneaE"
+                artifactId = "trapezoid-image-view"
+                version = "1.0.0"
+            }
+        }
+    }
+}
