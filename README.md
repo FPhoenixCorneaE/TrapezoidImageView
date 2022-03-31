@@ -3,7 +3,29 @@
 梯形图片控件
 ================================
 
+[![](https://jitpack.io/v/FPhoenixCorneaE/TrapezoidImageView.svg)](https://jitpack.io/#FPhoenixCorneaE/TrapezoidImageView)
+
 ![图片预览](https://github.com/FPhoenixCorneaE/TrapezoidImageView/blob/master/images/trapezoid-view.gif)
+
+
+How to include it in your project:
+--------------
+**Step 1.** Add the JitPack repository to your build file
+```groovy
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	}
+}
+```
+
+**Step 2.** Add the dependency
+```groovy
+dependencies {
+	implementation("com.github.FPhoenixCorneaE:TrapezoidImageView:$latest")
+}
+```
 
 
 xml中使用

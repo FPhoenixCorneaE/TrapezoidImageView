@@ -26,5 +26,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.github.bumptech.glide:glide:4.13.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.0'
-    implementation project(path: ':trapezoid-view')
+//    implementation project(path: ':trapezoid-view')
+    implementation 'com.github.FPhoenixCorneaE:TrapezoidImageView:1.0.0'
 }
